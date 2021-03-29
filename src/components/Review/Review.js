@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import fakeData from '../../fakeData';
 import { getDatabaseCart, processOrder, removeFromDatabaseCart } from '../../utilities/databaseManager';
 import Cart from '../Header/Cart/Cart';
 import ReviewItem from '../ReviewItem/ReviewItem';
@@ -27,17 +26,21 @@ const Review = () => {
 
     useEffect(() => {
         const saveCart = getDatabaseCart();
-        //console.log(saveCart);
         const productKeys = Object.keys(saveCart); // eta array
         //console.log(productKeys);
-        const cartProducts = productKeys.map(key => {
-            const product = fakeData.find(pd => pd.key === key);
-            product.quantity = saveCart[key];
-            return product;
-        });
-        setCart(cartProducts);
-        //console.log(cartProducts);
+
+        fetch('https://vast-dawn-65363.herokuapp.com/productByKeys', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(productKeys)
+        })
+            .then(res => res.json())
+            .then(data => setCart(data))
     }, [])
+
+
 
     let thankyou;
     if (orderPlaced) {
